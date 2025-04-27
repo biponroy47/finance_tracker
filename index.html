@@ -451,7 +451,6 @@
             })
             alert(await response.text())
             document.getElementById('dataForm').reset()
-            loadExpenses() // Refresh the report after submission
           } catch (error) {
             alert('Error: ' + error.message)
           }
