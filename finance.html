@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Expense Tracker</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --primary-color: #007aff;
+        --border-color: #d1d1d6;
+        --background-color: #f2f2f7;
+        --text-color: #1c1c1e;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: var(--background-color);
+        color: var(--text-color);
+      }
+
+      h1,
+      h2 {
+        color: var(--text-color);
+        font-weight: 600;
+      }
+
+      .form-section,
+      .report-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: center;
+      }
+
+      .form-group {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #636366;
+        font-weight: 500;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
+        -webkit-appearance: none;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #0066cc;
+      }
+
+      .filter-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+
+      .filter-controls select {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 15px;
+      }
+
+      th,
+      td {
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f7f7f8;
+        font-weight: 500;
+      }
+
+      .summary {
+        margin-top: 25px;
+      }
+
+      .summary h3 {
+        margin-bottom: 10px;
+      }
+
+      @media (max-width: 600px) {
+        .form-row {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .form-group {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Expense Tracker</h1>
+
+    <div class="form-section">
+      <h2>Add New Transaction</h2>
+      <form id="dataForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input
+              type="date"
+              id="date"
+              required />
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input
+              type="text"
+              id="description"
+              placeholder="Enter description"
+              required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <input
+              type="number"
+              id="amount"
+              placeholder="0.00"
+              step="0.01"
+              required />
+          </div>
+          <div class="form-group">
+            <label for="paymentMethod">Payment Method</label>
+            <select
+              id="paymentMethod"
+              required>
+              <option
+                value=""
+                disabled
+                selected>
+                Select method
+              </option>
+              <option value="Cash/ET">Cash/ET</option>
+              <option value="TD Debit">TD Debit</option>
+              <option value="TD Credit">TD Credit</option>
+              <option value="RBC Debit">RBC Debit</option>
+              <option value="RBC Credit">RBC Credit</option>
+              <option value="Amex Credit">Amex Credit</option>
+              <option value="Neo Credit">Neo Credit</option>
+              <option value="Capital One Credit">Capital One Credit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              required>
+              <option
+                value=""
+                disabled
+                selected>
+                Select category
+              </option>
+              <option value="Food">Food</option>
+              <option value="Groceries">Groceries</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Beer">Beer</option>
+              <option value="Bars">Bars</option>
+              <option value="Subscriptions">Subscriptions</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Fees">Fees</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="submit">Add Transaction</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="report-section">
+      <h2>Expense Report</h2>
+      <div class="filter-controls">
+        <select
+          id="yearSelect"
+          required>
+          <option
+            value=""
+            disabled
+            selected>
+            Select Year
+          </option>
+        </select>
+        <select
+          id="monthSelect"
+          required>
+          <option
+            value=""
+            disabled
+            selected>
+            Select Month
+          </option>
+          <option value="1">January</option>
+          <option value="2">February</option>
+          <option value="3">March</option>
+          <option value="4">April</option>
+          <option value="5">May</option>
+          <option value="6">June</option>
+          <option value="7">July</option>
+          <option value="8">August</option>
+          <option value="9">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select>
+        <button
+          id="showExpensesBtn"
+          onclick="loadExpenses()"
+          disabled>
+          Show Expenses
+        </button>
+      </div>
+
+      <div id="expenseResults">
+        <!-- Results will appear here -->
+      </div>
+    </div>
+
+    <script>
+      const SCRIPT_URL =
+        'https://script.google.com/macros/s/AKfycbzm4sYzqvzkcftBGhepRjeYoipVD9CMMoKmCQAbV_eaaaRM0sNkVGJrEiwDsL4iQjBQYQ/exec'
+
+      // Populate year dropdown
+      function populateYears() {
+        const yearSelect = document.getElementById('yearSelect')
+        const currentYear = new Date().getFullYear()
+        for (let year = currentYear; year >= currentYear - 1; year--) {
+          const option = document.createElement('option')
+          option.value = year
+          option.textContent = year
+          yearSelect.appendChild(option)
+        }
+      }
+
+      // Load expenses based on filters
+      async function loadExpenses() {
+        const year = document.getElementById('yearSelect').value
+        const month = document.getElementById('monthSelect').value
+        const resultsDiv = document.getElementById('expenseResults')
+
+        try {
+          let url = SCRIPT_URL
+          if (year || month) {
+            url += `?year=${year}&month=${month}`
+          }
+
+          const response = await fetch(url)
+          const data = await response.json()
+
+          // Display all transactions
+          let html = `<h3>All Transactions</h3>`
+          if (data.allTransactions.length > 0) {
+            html += `<table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Category</th>
+                        </tr>`
+
+            data.allTransactions.forEach((row, index) => {
+              if (index === 0) return // Skip header row
+              const date = new Date(row[0])
+              html += `<tr>
+                            <td>${date.toLocaleDateString()}</td>
+                            <td>${row[1] || ''}</td>
+                            <td>$${parseFloat(row[2] || 0).toFixed(2)}</td>
+                            <td>${row[3] || ''}</td>
+                            <td>${row[4] || ''}</td>
+                        </tr>`
+            })
+
+            html += `</table>`
+          } else {
+            html += `<p>No transactions found</p>`
+          }
+
+          // Display category summary
+          if (data.summary && data.summary.length > 0) {
+            html += `<div class="summary">
+                        <h3>Category Summary</h3>
+                        <table>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Percentage</th>
+                            </tr>`
+
+            data.summary.forEach((item) => {
+              html += `<tr>
+                            <td>${item.category}</td>
+                            <td>$${item.amount.toFixed(2)}</td>
+                            <td>${item.percentage}</td>
+                        </tr>`
+            })
+
+            html += `<tr>
+                        <td><strong>Total</strong></td>
+                        <td><strong>$${data.grandTotal.toFixed(2)}</strong></td>
+                        <td>100%</td>
+                    </tr>`
+
+            html += `</table></div>`
+          }
+
+          resultsDiv.innerHTML = html
+        } catch (error) {
+          resultsDiv.innerHTML = `<p class="error">Error loading data: ${error.message}</p>`
+        }
+      }
+
+      // Initialize
+      document.addEventListener('DOMContentLoaded', () => {
+        populateYears()
+      })
+
+      // Form submission
+      document
+        .getElementById('dataForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault()
+
+          const data = {
+            date: document.getElementById('date').value,
+            description: document.getElementById('description').value,
+            amount: parseFloat(document.getElementById('amount').value),
+            tender: document.getElementById('paymentMethod').value,
+            category: document.getElementById('category').value,
+          }
+
+          try {
+            const response = await fetch(SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify(data),
+            })
+            alert(await response.text())
+            document.getElementById('dataForm').reset()
+            loadExpenses() // Refresh the report after submission
+          } catch (error) {
+            alert('Error: ' + error.message)
+          }
+        })
+    </script>
+  </body>
+</html>
