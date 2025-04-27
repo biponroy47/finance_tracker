@@ -48,7 +48,7 @@
 
       .form-group {
         flex: 1;
-        min-width: 150px;
+        min-width: 0; /* Changed from 150px to allow equal distribution */
       }
 
       label {
@@ -59,15 +59,29 @@
         font-weight: 500;
       }
 
-      input,
+      /* Consolidated input styles for consistent sizing */
+      input[type='date'],
+      input[type='text'],
+      input[type='number'],
       select {
         width: 100%;
+        box-sizing: border-box;
         padding: 12px;
         border: 1px solid var(--border-color);
         border-radius: 8px;
         font-size: 16px;
         background: white;
         -webkit-appearance: none;
+        appearance: none;
+      }
+
+      /* Custom select dropdown arrow */
+      select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 36px;
       }
 
       input:focus,
@@ -142,6 +156,21 @@
         .form-group {
           width: 100%;
         }
+      }
+
+      /* Additional utility classes */
+      .error {
+        color: #ff3b30;
+        padding: 10px;
+        background-color: #ffebee;
+        border-radius: 4px;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+        color: #636366;
+        font-style: italic;
       }
     </style>
   </head>
