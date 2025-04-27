@@ -298,6 +298,27 @@
         }
       }
 
+      // Add this after your populateYears() function
+      function setupEventListeners() {
+        const yearSelect = document.getElementById('yearSelect')
+        const monthSelect = document.getElementById('monthSelect')
+        const showBtn = document.getElementById('showExpensesBtn')
+
+        // Enable/disable button based on selections
+        function checkSelections() {
+          showBtn.disabled = !(yearSelect.value && monthSelect.value)
+        }
+
+        yearSelect.addEventListener('change', checkSelections)
+        monthSelect.addEventListener('change', checkSelections)
+
+        // Proper click handler
+        showBtn.addEventListener('click', function (e) {
+          e.preventDefault()
+          loadExpenses()
+        })
+      }
+
       // Load expenses based on filters
       async function loadExpenses() {
         const year = document.getElementById('yearSelect').value
@@ -379,6 +400,7 @@
       // Initialize
       document.addEventListener('DOMContentLoaded', () => {
         populateYears()
+        setupEventListeners()
       })
 
       // Form submission
