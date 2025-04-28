@@ -336,7 +336,7 @@
 
         // Enable/disable button based on selections
         function checkSelections() {
-          showBtn.disabled = !(yearSelect.value && monthSelect.value)
+          showBtn.disabled = !(yearSelect.value || monthSelect.value)
         }
 
         yearSelect.addEventListener('change', checkSelections)
