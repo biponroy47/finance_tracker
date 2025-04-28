@@ -357,7 +357,7 @@
 
         try {
           let url = SCRIPT_URL
-          if (year && month) {
+          if (year || month) {
             url += `?year=${year}&month=${month}`
           }
 
