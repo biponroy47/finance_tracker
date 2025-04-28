@@ -4,5 +4,5 @@ Uses a Google Spreadsheet + Script for backend.
 
 90% "vibe coded".
 
-![](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png)
-![](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png)
+![](https://github.com/biponroy47/finance_tracker/blob/main/eg2.jpg)
+![](https://github.com/biponroy47/finance_tracker/blob/main/eg2.jpg)
