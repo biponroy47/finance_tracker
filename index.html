@@ -314,7 +314,7 @@
 
     <script>
       const SCRIPT_URL =
-        'https://script.google.com/macros/s/AKfycbxjzIq1NVTkBB-xGzjVlteM6lIfLAQQTZp4-lvlc7oK1QYUZFb_Pq7AOV4IffNl5lvbDw/exec'
+        'https://script.google.com/macros/s/AKfycbyYVnE4eOZAGYjTvH-_pk9_69Xs6Hd-xCZKo4K9-9CCdig6VP57qea6HVH6VwyWxFMCbA/exec'
 
       // Populate year dropdown
       function populateYears() {
@@ -437,8 +437,10 @@
         .addEventListener('submit', async (e) => {
           e.preventDefault()
 
+          const dateStr = document.getElementById('date').value
+
           const data = {
-            date: document.getElementById('date').value,
+            date: dateStr,
             description: document.getElementById('description').value,
             amount: parseFloat(document.getElementById('amount').value),
             tender: document.getElementById('paymentMethod').value,
