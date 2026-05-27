@@ -34,7 +34,6 @@ const ALLOWED_TENDERS = new Set([
   'Cash/ET',
   'TD Debit',
   'TD Credit',
-  'RBC Debit',
   'RBC Credit',
   'Amex Credit',
   'Neo Credit',
