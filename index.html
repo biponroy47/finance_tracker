@@ -312,7 +312,10 @@
 
     <script src="config.js"></script>
     <script>
-      const SCRIPT_URL = window.FINANCE_TRACKER_CONFIG?.SCRIPT_URL
+      const DEFAULT_SCRIPT_URL =
+        'https://script.google.com/macros/s/AKfycby15h_OgAl7pgTBm0fz-9OIoPFR7Q5V9Tf6YJtn5iiwg7pnnnNZCAskjg-5dm1psFDICQ/exec'
+      const SCRIPT_URL =
+        window.FINANCE_TRACKER_CONFIG?.SCRIPT_URL || DEFAULT_SCRIPT_URL
 
       // Populate year dropdown
       function populateYears() {
@@ -368,9 +371,7 @@
 
       function getScriptUrl() {
         if (!SCRIPT_URL) {
-          throw new Error(
-            'Missing Apps Script URL. Copy config.example.js to config.js and set SCRIPT_URL.'
-          )
+          throw new Error('Missing Apps Script URL.')
         }
         return SCRIPT_URL
       }
