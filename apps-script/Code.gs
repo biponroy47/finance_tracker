@@ -4,7 +4,6 @@ const ALLOWED_TENDERS = new Set([
   'Cash/ET',
   'TD Debit',
   'TD Credit',
-  'RBC Debit',
   'RBC Credit',
   'Amex Credit',
   'Neo Credit',
@@ -62,7 +61,7 @@ function doPost(e) {
       transaction.amount,
       transaction.tender,
       transaction.category,
-      false,
+      'No',
     ])
 
     return jsonResponse({
