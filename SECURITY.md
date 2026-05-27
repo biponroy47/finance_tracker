@@ -2,15 +2,18 @@
 
 ## Apps Script URL
 
-Do not commit the real Google Apps Script deployment URL. Keep it in a local
-`config.js` file copied from `config.example.js`.
+The Google Apps Script deployment URL is public in a browser-only static app:
+anyone who can submit expenses can inspect the endpoint in DevTools. The
+committed production URL keeps the Netlify app functional, while local
+`config.js` can still override it for testing another deployment.
 
-If the real URL was ever committed or published:
+If the URL is abused or needs to be rotated:
 
 1. Open the Apps Script project.
 2. Create a new web app deployment.
-3. Update local `config.js` with the new `/exec` URL.
-4. Disable or delete the old deployment.
+3. Update the production fallback URL in `index.html`.
+4. Update local `config.js` if you use one.
+5. Disable or delete the old deployment.
 
 ## Apps Script Validation
 
