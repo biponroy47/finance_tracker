@@ -301,7 +301,6 @@
         </select>
         <button
           id="showExpensesBtn"
-          onclick="loadExpenses()"
           disabled>
           Show Expenses
         </button>
@@ -312,9 +311,9 @@
       </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
-      const SCRIPT_URL =
-        'https://script.google.com/macros/s/AKfycby15h_OgAl7pgTBm0fz-9OIoPFR7Q5V9Tf6YJtn5iiwg7pnnnNZCAskjg-5dm1psFDICQ/exec'
+      const SCRIPT_URL = window.FINANCE_TRACKER_CONFIG?.SCRIPT_URL
 
       // Populate year dropdown
       function populateYears() {
@@ -328,7 +327,92 @@
         }
       }
 
-      // Add this after your populateYears() function
+      const currencyFormatter = new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+      })
+
+      function createElement(tagName, textContent, className) {
+        const element = document.createElement(tagName)
+        if (textContent !== undefined) {
+          element.textContent = textContent
+        }
+        if (className) {
+          element.className = className
+        }
+        return element
+      }
+
+      function createTable(headers, rows) {
+        const table = document.createElement('table')
+        const headerRow = document.createElement('tr')
+
+        headers.forEach((header) => {
+          headerRow.appendChild(createElement('th', header))
+        })
+        table.appendChild(headerRow)
+
+        rows.forEach((row) => {
+          const tableRow = document.createElement('tr')
+          row.forEach((cell) => {
+            tableRow.appendChild(createElement('td', cell))
+          })
+          table.appendChild(tableRow)
+        })
+
+        return table
+      }
+
+      function showError(container, message) {
+        container.replaceChildren(createElement('p', message, 'error'))
+      }
+
+      function getScriptUrl() {
+        if (!SCRIPT_URL) {
+          throw new Error(
+            'Missing Apps Script URL. Copy config.example.js to config.js and set SCRIPT_URL.'
+          )
+        }
+        return SCRIPT_URL
+      }
+
+      function formatDate(value) {
+        const date = new Date(value)
+        if (Number.isNaN(date.getTime())) {
+          return value || ''
+        }
+        return date.toLocaleDateString()
+      }
+
+      function formatAmount(value) {
+        const amount = Number(value)
+        if (!Number.isFinite(amount)) {
+          return currencyFormatter.format(0)
+        }
+        return currencyFormatter.format(amount)
+      }
+
+      async function readJsonResponse(response) {
+        const text = await response.text()
+        if (!response.ok) {
+          throw new Error(text || `Request failed with status ${response.status}`)
+        }
+
+        try {
+          return JSON.parse(text)
+        } catch (error) {
+          throw new Error('The server returned invalid JSON.')
+        }
+      }
+
+      async function readSaveResponse(response) {
+        const data = await readJsonResponse(response)
+        if (!data.success) {
+          throw new Error(data.error || 'The transaction was not saved.')
+        }
+        return data.message || 'Data saved successfully!'
+      }
+
       function setupEventListeners() {
         const yearSelect = document.getElementById('yearSelect')
         const monthSelect = document.getElementById('monthSelect')
@@ -342,11 +426,70 @@
         yearSelect.addEventListener('change', checkSelections)
         monthSelect.addEventListener('change', checkSelections)
 
-        // Proper click handler
         showBtn.addEventListener('click', function (e) {
           e.preventDefault()
           loadExpenses()
         })
+      }
+
+      function buildExpensesUrl(year, month) {
+        const url = new URL(getScriptUrl())
+        if (year) {
+          url.searchParams.set('year', year)
+        }
+        if (month) {
+          url.searchParams.set('month', month)
+        }
+        return url.toString()
+      }
+
+      function validateExpensesResponse(data) {
+        if (!data || typeof data !== 'object') {
+          throw new Error('The server returned an invalid response.')
+        }
+        if (!Array.isArray(data.allTransactions)) {
+          throw new Error('The server response is missing transactions.')
+        }
+        if (data.summary !== undefined && !Array.isArray(data.summary)) {
+          throw new Error('The server response has an invalid summary.')
+        }
+      }
+
+      function renderExpenses(data, container) {
+        const allTransactions = data.allTransactions.slice(1)
+        const elements = [createElement('h3', 'All Transactions')]
+
+        if (allTransactions.length > 0) {
+          const rows = allTransactions.map((row) => [
+            formatDate(row[0]),
+            row[1] || '',
+            formatAmount(row[2]),
+            row[3] || '',
+          ])
+          elements.push(
+            createTable(['Date', 'Description', 'Amount', 'Payment'], rows)
+          )
+        } else {
+          elements.push(createElement('p', 'No transactions found'))
+        }
+
+        if (data.summary && data.summary.length > 0) {
+          const summary = createElement('div', undefined, 'summary')
+          const rows = data.summary.map((item) => [
+            item.category || '',
+            formatAmount(item.amount),
+            item.percentageFormatted || item.percentage || '',
+          ])
+
+          rows.push(['Total', formatAmount(data.grandTotal), '100%'])
+          summary.appendChild(createElement('h3', 'Category Summary'))
+          summary.appendChild(
+            createTable(['Category', 'Amount', 'Percentage'], rows)
+          )
+          elements.push(summary)
+        }
+
+        container.replaceChildren(...elements)
       }
 
       // Load expenses based on filters
@@ -356,72 +499,31 @@
         const resultsDiv = document.getElementById('expenseResults')
 
         try {
-          let url = SCRIPT_URL
-          if (year || month) {
-            url += `?year=${year}&month=${month}`
-          }
-
-          const response = await fetch(url)
-          const data = await response.json()
-
-          // Display all transactions
-          let html = `<h3>All Transactions</h3>`
-          if (data.allTransactions.length > 0) {
-            html += `<table>
-                        <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Payment</th>
-                        </tr>`
-
-            data.allTransactions.forEach((row, index) => {
-              if (index === 0) return // Skip header row
-              const date = new Date(row[0])
-              html += `<tr>
-                            <td>${date.toLocaleDateString()}</td>
-                            <td>${row[1] || ''}</td>
-                            <td>$${parseFloat(row[2] || 0).toFixed(2)}</td>
-                            <td>${row[3] || ''}</td>
-                        </tr>`
-            })
-
-            html += `</table>`
-          } else {
-            html += `<p>No transactions found</p>`
-          }
-
-          // Display category summary
-          if (data.summary && data.summary.length > 0) {
-            html += `<div class="summary">
-                        <h3>Category Summary</h3>
-                        <table>
-                            <tr>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th>Percentage</th>
-                            </tr>`
-
-            data.summary.forEach((item) => {
-              html += `<tr>
-                            <td>${item.category}</td>
-                            <td>$${item.amount.toFixed(2)}</td>
-                            <td>${item.percentage}</td>
-                        </tr>`
-            })
-
-            html += `<tr>
-                        <td><strong>Total</strong></td>
-                        <td><strong>$${data.grandTotal.toFixed(2)}</strong></td>
-                        <td>100%</td>
-                    </tr>`
-
-            html += `</table></div>`
-          }
-
-          resultsDiv.innerHTML = html
+          resultsDiv.replaceChildren(createElement('p', 'Loading...', 'loading'))
+          const response = await fetch(buildExpensesUrl(year, month))
+          const data = await readJsonResponse(response)
+          validateExpensesResponse(data)
+          renderExpenses(data, resultsDiv)
         } catch (error) {
-          resultsDiv.innerHTML = `<p class="error">Error loading data: ${error.message}</p>`
+          showError(resultsDiv, `Error loading data: ${error.message}`)
+        }
+      }
+
+      function validateTransaction(data) {
+        if (!data.date) {
+          throw new Error('Date is required.')
+        }
+        if (!data.description.trim()) {
+          throw new Error('Description is required.')
+        }
+        if (!Number.isFinite(data.amount) || data.amount <= 0) {
+          throw new Error('Amount must be greater than zero.')
+        }
+        if (!data.tender) {
+          throw new Error('Payment method is required.')
+        }
+        if (!data.category) {
+          throw new Error('Category is required.')
         }
       }
 
@@ -441,18 +543,22 @@
 
           const data = {
             date: dateStr,
-            description: document.getElementById('description').value,
+            description: document.getElementById('description').value.trim(),
             amount: parseFloat(document.getElementById('amount').value),
             tender: document.getElementById('paymentMethod').value,
             category: document.getElementById('category').value,
           }
 
           try {
-            const response = await fetch(SCRIPT_URL, {
+            validateTransaction(data)
+            const response = await fetch(getScriptUrl(), {
               method: 'POST',
+              headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+              },
               body: JSON.stringify(data),
             })
-            alert(await response.text())
+            alert(await readSaveResponse(response))
             document.getElementById('dataForm').reset()
           } catch (error) {
             alert('Error: ' + error.message)
