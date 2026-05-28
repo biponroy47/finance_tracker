@@ -328,20 +328,76 @@
         background: var(--error-color);
       }
 
-      .filter-controls {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        margin-bottom: 14px;
-      }
-
-      .filter-controls button {
-        grid-column: 1 / -1;
+      .report-period {
+        margin: -7px 0 14px;
+        color: var(--muted-text);
+        font-size: 14px;
+        font-weight: 650;
       }
 
       #expenseResults {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+      }
+
+      .chart {
+        display: grid;
+        gap: 12px;
+      }
+
+      .chart-row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .chart-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .chart-label {
+        color: var(--text-color);
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .chart-numbers {
+        color: var(--muted-text);
+        font-size: 12px;
+        font-weight: 750;
+        line-height: 1.2;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .chart-track {
+        height: 10px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--muted-surface);
+      }
+
+      .chart-bar {
+        width: var(--bar-width);
+        height: 100%;
+        border-radius: inherit;
+        background: var(--accent-color);
+      }
+
+      .summary-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 13px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-color);
+        font-size: 14px;
+        font-weight: 800;
       }
 
       table {
@@ -378,7 +434,7 @@
       }
 
       .summary {
-        margin-top: 22px;
+        margin-top: 0;
       }
 
       .error {
@@ -423,6 +479,10 @@
           margin-bottom: 10px;
         }
 
+        .form-row.paired-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
         .choice-grid {
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
@@ -434,17 +494,6 @@
         }
       }
 
-      @media (min-width: 720px) {
-        .filter-controls {
-          grid-template-columns: 1fr 1fr auto;
-          align-items: end;
-        }
-
-        .filter-controls button {
-          grid-column: auto;
-          min-width: 160px;
-        }
-      }
     </style>
   </head>
   <body>
@@ -462,14 +511,7 @@
           id="dataForm"
           autocomplete="off"
           novalidate>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="date">Date</label>
-              <input
-                type="date"
-                id="date"
-                required />
-            </div>
+          <div class="form-row single">
             <div class="form-group">
               <label for="description">Description</label>
               <input
@@ -481,7 +523,7 @@
             </div>
           </div>
 
-          <div class="form-row single">
+          <div class="form-row paired-row">
             <div class="form-group">
               <label for="amount">Amount</label>
               <input
@@ -490,6 +532,13 @@
                 placeholder="0.00"
                 step="0.01"
                 inputmode="decimal"
+                required />
+            </div>
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input
+                type="date"
+                id="date"
                 required />
             </div>
           </div>
@@ -669,45 +718,9 @@
         <div class="section-heading">
           <h2>Expense Report</h2>
         </div>
-        <div class="filter-controls">
-          <select
-            id="monthSelect"
-            required>
-            <option
-              value=""
-              disabled
-              selected>
-              Select Month
-            </option>
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          <select
-            id="yearSelect"
-            required>
-            <option
-              value=""
-              disabled
-              selected>
-              Select Year
-            </option>
-          </select>
-          <button
-            id="showExpensesBtn"
-            disabled>
-            Show Expenses
-          </button>
-        </div>
+        <p
+          id="reportPeriod"
+          class="report-period"></p>
 
         <div id="expenseResults">
           <!-- Results will appear here -->
@@ -722,17 +735,106 @@
       const SCRIPT_URL =
         window.FINANCE_TRACKER_CONFIG?.SCRIPT_URL || DEFAULT_SCRIPT_URL
 
-      // Populate year dropdown
-      function populateYears() {
-        const yearSelect = document.getElementById('yearSelect')
-        const currentYear = new Date().getFullYear()
-        for (let year = currentYear; year >= currentYear - 1; year--) {
-          const option = document.createElement('option')
-          option.value = year
-          option.textContent = year
-          yearSelect.appendChild(option)
-        }
-      }
+      const SAMPLE_EXPENSES = [
+        {
+          date: '2026-05-01',
+          description: 'May rent',
+          amount: 1850,
+          tender: 'Cash/ET',
+          category: 'Rent',
+        },
+        {
+          date: '2026-05-02',
+          description: 'No Frills grocery run',
+          amount: 86.42,
+          tender: 'TD Debit',
+          category: 'Groceries',
+        },
+        {
+          date: '2026-05-03',
+          description: 'TTC monthly pass',
+          amount: 156,
+          tender: 'RBC Credit',
+          category: 'Transportation',
+        },
+        {
+          date: '2026-05-04',
+          description: 'Netflix subscription',
+          amount: 18.63,
+          tender: 'Amex Credit',
+          category: 'Subscriptions',
+        },
+        {
+          date: '2026-05-06',
+          description: 'Coffee with Sam',
+          amount: 9.85,
+          tender: 'TD Credit',
+          category: 'Food',
+        },
+        {
+          date: '2026-05-08',
+          description: 'Shoppers toiletries',
+          amount: 43.27,
+          tender: 'Neo Credit',
+          category: 'Shopping',
+        },
+        {
+          date: '2026-05-10',
+          description: 'Pizza dinner',
+          amount: 31.5,
+          tender: 'TD Credit',
+          category: 'Food',
+        },
+        {
+          date: '2026-05-11',
+          description: 'LCBO tall cans',
+          amount: 24.9,
+          tender: 'Cash/ET',
+          category: 'Beer',
+        },
+        {
+          date: '2026-05-13',
+          description: 'Bar tab downtown',
+          amount: 68.44,
+          tender: 'Amex Credit',
+          category: 'Bars',
+        },
+        {
+          date: '2026-05-15',
+          description: 'Concert ticket',
+          amount: 74.25,
+          tender: 'RBC Credit',
+          category: 'Entertainment',
+        },
+        {
+          date: '2026-05-18',
+          description: 'Farm Boy groceries',
+          amount: 112.36,
+          tender: 'TD Debit',
+          category: 'Groceries',
+        },
+        {
+          date: '2026-05-20',
+          description: 'Uber home',
+          amount: 22.18,
+          tender: 'Capital One Credit',
+          category: 'Transportation',
+        },
+        {
+          date: '2026-05-22',
+          description: 'Bank account fee',
+          amount: 16.95,
+          tender: 'TD Debit',
+          category: 'Fees',
+        },
+        {
+          date: '2026-05-25',
+          description: 'Birthday gift',
+          amount: 58.72,
+          tender: 'Neo Credit',
+          category: 'Other',
+        },
+      ]
 
       const currencyFormatter = new Intl.NumberFormat('en-CA', {
         style: 'currency',
@@ -782,6 +884,11 @@
       }
 
       function formatDate(value) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          const [year, month, day] = value.split('-').map(Number)
+          return new Date(year, month - 1, day).toLocaleDateString()
+        }
+
         const date = new Date(value)
         if (Number.isNaN(date.getTime())) {
           return value || ''
@@ -922,25 +1029,6 @@
         })
       }
 
-      function setupEventListeners() {
-        const yearSelect = document.getElementById('yearSelect')
-        const monthSelect = document.getElementById('monthSelect')
-        const showBtn = document.getElementById('showExpensesBtn')
-
-        // Enable/disable button based on selections
-        function checkSelections() {
-          showBtn.disabled = !(yearSelect.value || monthSelect.value)
-        }
-
-        yearSelect.addEventListener('change', checkSelections)
-        monthSelect.addEventListener('change', checkSelections)
-
-        showBtn.addEventListener('click', function (e) {
-          e.preventDefault()
-          loadExpenses()
-        })
-      }
-
       function buildExpensesUrl(year, month) {
         const url = new URL(getScriptUrl())
         if (year) {
@@ -950,6 +1038,48 @@
           url.searchParams.set('month', month)
         }
         return url.toString()
+      }
+
+      function getSampleExpenses(year, month) {
+        return SAMPLE_EXPENSES.filter((expense) => {
+          const expenseDate = new Date(`${expense.date}T00:00:00`)
+          const matchesYear = !year || expenseDate.getFullYear() === Number(year)
+          const matchesMonth = !month || expenseDate.getMonth() + 1 === Number(month)
+          return matchesYear && matchesMonth
+        })
+      }
+
+      function buildSampleExpensesData(year, month) {
+        const expenses = getSampleExpenses(year, month)
+        const categoryTotals = expenses.reduce((totals, expense) => {
+          totals[expense.category] = (totals[expense.category] || 0) + expense.amount
+          return totals
+        }, {})
+        const grandTotal = expenses.reduce((total, expense) => total + expense.amount, 0)
+        const summary = Object.entries(categoryTotals)
+          .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
+          .map(([category, amount]) => ({
+            category,
+            amount,
+            percentageFormatted: grandTotal
+              ? `${((amount / grandTotal) * 100).toFixed(1)}%`
+              : '0%',
+          }))
+
+        return {
+          allTransactions: [
+            ['Date', 'Description', 'Amount', 'Payment', 'Category'],
+            ...expenses.map((expense) => [
+              expense.date,
+              expense.description,
+              expense.amount,
+              expense.tender,
+              expense.category,
+            ]),
+          ],
+          summary,
+          grandTotal,
+        }
       }
 
       function validateExpensesResponse(data) {
@@ -964,50 +1094,86 @@
         }
       }
 
-      function renderExpenses(data, container) {
-        const allTransactions = data.allTransactions.slice(1)
-        const elements = [createElement('h3', 'All Transactions')]
-
-        if (allTransactions.length > 0) {
-          const rows = allTransactions.map((row) => [
-            formatDate(row[0]),
-            row[1] || '',
-            formatAmount(row[2]),
-            row[3] || '',
-          ])
-          elements.push(
-            createTable(['Date', 'Description', 'Amount', 'Payment'], rows)
-          )
-        } else {
-          elements.push(createElement('p', 'No transactions found'))
+      function getActiveReportPeriod() {
+        const today = new Date()
+        return {
+          month: today.getMonth() + 1,
+          year: today.getFullYear(),
         }
+      }
+
+      function formatReportPeriod(year, month) {
+        return new Intl.DateTimeFormat('en-CA', {
+          month: 'long',
+          year: 'numeric',
+        }).format(new Date(year, month - 1, 1))
+      }
+
+      function createCategoryChart(items, grandTotal) {
+        const chart = createElement('div', undefined, 'chart')
+        const maxAmount = Math.max(...items.map((item) => Number(item.amount)), 0)
+
+        items.forEach((item) => {
+          const amount = Number(item.amount) || 0
+          const percentage = grandTotal ? `${((amount / grandTotal) * 100).toFixed(1)}%` : '0%'
+          const row = createElement('div', undefined, 'chart-row')
+          const meta = createElement('div', undefined, 'chart-meta')
+          const label = createElement('span', item.category || '', 'chart-label')
+          const numbers = createElement(
+            'span',
+            `${formatAmount(amount)} | ${percentage}`,
+            'chart-numbers'
+          )
+          const track = createElement('div', undefined, 'chart-track')
+          const bar = createElement('div', undefined, 'chart-bar')
+
+          bar.style.setProperty(
+            '--bar-width',
+            `${maxAmount ? Math.max((amount / maxAmount) * 100, 2) : 0}%`
+          )
+          meta.append(label, numbers)
+          track.appendChild(bar)
+          row.append(meta, track)
+          chart.appendChild(row)
+        })
+
+        return chart
+      }
+
+      function renderExpenses(data, container) {
+        const elements = []
 
         if (data.summary && data.summary.length > 0) {
           const summary = createElement('div', undefined, 'summary')
-          const rows = data.summary.map((item) => [
-            item.category || '',
-            formatAmount(item.amount),
-            item.percentageFormatted || item.percentage || '',
-          ])
+          const total = createElement('div', undefined, 'summary-total')
+          const totalLabel = createElement('span', 'Total')
+          const totalAmount = createElement('span', formatAmount(data.grandTotal))
 
-          rows.push(['Total', formatAmount(data.grandTotal), '100%'])
           summary.appendChild(createElement('h3', 'Category Summary'))
-          summary.appendChild(
-            createTable(['Category', 'Amount', 'Percentage'], rows)
-          )
+          summary.appendChild(createCategoryChart(data.summary, data.grandTotal))
+          total.append(totalLabel, totalAmount)
+          summary.appendChild(total)
           elements.push(summary)
+        } else {
+          elements.push(createElement('p', 'No transactions found'))
         }
 
         container.replaceChildren(...elements)
       }
 
-      // Load expenses based on filters
-      async function loadExpenses() {
-        const year = document.getElementById('yearSelect').value
-        const month = document.getElementById('monthSelect').value
+      async function loadActiveMonthExpenses() {
+        const { year, month } = getActiveReportPeriod()
         const resultsDiv = document.getElementById('expenseResults')
+        const reportPeriod = document.getElementById('reportPeriod')
+        const sampleData = buildSampleExpensesData(year, month)
+        reportPeriod.textContent = formatReportPeriod(year, month)
 
         try {
+          if (sampleData.allTransactions.length > 1) {
+            renderExpenses(sampleData, resultsDiv)
+            return
+          }
+
           resultsDiv.replaceChildren(createElement('p', 'Loading...', 'loading'))
           const response = await fetch(buildExpensesUrl(year, month))
           const data = await readJsonResponse(response)
@@ -1043,8 +1209,7 @@
         restoreSavedChoices()
         setupChoiceButtons()
         setupEntryFlow()
-        populateYears()
-        setupEventListeners()
+        loadActiveMonthExpenses()
         document.getElementById('description').focus()
       })
 
