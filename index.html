@@ -5,73 +5,136 @@
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1" />
+    <meta
+      name="theme-color"
+      content="#f4f7f5" />
     <style>
       :root {
-        --primary-color: #007aff;
-        --primary-dark: #005ecb;
-        --success-color: #1f8a4c;
-        --error-color: #c92a2a;
-        --border-color: #d1d1d6;
-        --background-color: #f2f2f7;
+        color-scheme: light;
+        --accent-color: #195f56;
+        --accent-dark: #124942;
+        --accent-soft: #e7f1ed;
+        --success-color: #1f7a4d;
+        --error-color: #b42318;
+        --border-color: #d9e2dc;
+        --background-color: #f4f7f5;
         --surface-color: #ffffff;
-        --muted-surface: #f7f7f8;
-        --text-color: #1c1c1e;
-        --muted-text: #636366;
+        --muted-surface: #eef3f0;
+        --text-color: #202522;
+        --muted-text: #69746e;
+        --shadow-color: rgba(31, 33, 29, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--background-color);
       }
 
       body {
+        min-height: 100vh;
+        margin: 0;
+        background:
+          linear-gradient(180deg, rgba(231, 241, 237, 0.75), transparent 250px),
+          var(--background-color);
+        color: var(--text-color);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
           Helvetica, Arial, sans-serif;
-        padding: 14px;
-        max-width: 800px;
-        margin: 0 auto;
-        background-color: var(--background-color);
-        color: var(--text-color);
       }
 
-      h1 {
-        margin: 8px 0 12px;
-        font-size: clamp(27px, 6.5vw, 38px);
+      .app-shell {
+        width: min(100%, 820px);
+        margin: 0 auto;
+        padding: 18px 14px 28px;
+      }
+
+      .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 8px 2px 16px;
       }
 
       h1,
-      h2 {
+      h2,
+      h3 {
+        margin: 0;
         color: var(--text-color);
-        font-weight: 600;
+        font-weight: 650;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        font-size: 31px;
+        line-height: 1.04;
       }
 
       h2 {
-        margin: 0 0 12px;
-        font-size: 21px;
+        font-size: 18px;
+        line-height: 1.2;
+      }
+
+      h3 {
+        margin: 18px 0 10px;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      .currency-pill {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0 11px;
+        border: 1px solid rgba(25, 95, 86, 0.2);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--accent-dark);
+        font-size: 13px;
+        font-weight: 700;
       }
 
       .form-section,
       .report-section {
-        background: var(--surface-color);
-        border-radius: 12px;
-        padding: 14px;
-        margin-bottom: 16px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 14px;
+        padding: 16px;
+        border: 1px solid rgba(217, 226, 220, 0.92);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 12px 28px var(--shadow-color);
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
       }
 
       .form-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 10px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 11px;
       }
 
-      .form-group {
-        flex: 1;
-        min-width: 0;
+      .form-row.single {
+        grid-template-columns: 1fr;
       }
 
-      label {
+      label,
+      .choice-section legend {
         display: block;
-        margin-bottom: 4px;
-        font-size: 14px;
+        margin-bottom: 6px;
         color: var(--muted-text);
-        font-weight: 500;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-transform: uppercase;
       }
 
       input[type='date'],
@@ -79,101 +142,119 @@
       input[type='number'],
       select {
         width: 100%;
-        box-sizing: border-box;
-        padding: 10px 12px;
+        min-height: 46px;
         border: 1px solid var(--border-color);
         border-radius: 8px;
+        background: #ffffff;
+        color: var(--text-color);
+        font: inherit;
         font-size: 16px;
-        background: var(--surface-color);
+        line-height: 1.3;
+        padding: 11px 12px;
         -webkit-appearance: none;
         appearance: none;
+        transition:
+          border-color 0.16s ease,
+          box-shadow 0.16s ease,
+          background-color 0.16s ease;
       }
 
-      /* Custom select dropdown arrow */
+      input::placeholder {
+        color: #9aa39e;
+      }
+
       select {
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        padding-right: 38px;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2369746e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 12px center;
-        background-size: 16px;
-        padding-right: 36px;
+        background-size: 18px;
       }
 
       input:focus,
-      select:focus {
+      select:focus,
+      button:focus-visible {
         outline: none;
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(25, 95, 86, 0.13);
       }
 
       button {
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
         width: 100%;
-        transition: background-color 0.2s, opacity 0.2s;
+        min-height: 46px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: var(--accent-color);
+        color: #ffffff;
+        cursor: pointer;
+        font: inherit;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.15;
+        padding: 12px 15px;
+        transition:
+          background-color 0.16s ease,
+          border-color 0.16s ease,
+          box-shadow 0.16s ease,
+          opacity 0.16s ease,
+          transform 0.16s ease;
       }
 
       button:hover {
-        background-color: var(--primary-dark);
+        background: var(--accent-dark);
+      }
+
+      button:active {
+        transform: translateY(1px);
       }
 
       button:disabled {
         cursor: not-allowed;
-        opacity: 0.72;
+        opacity: 0.58;
+        transform: none;
       }
 
       .choice-section {
-        border: 0;
-        margin: 0 0 10px;
+        margin: 0 0 13px;
         padding: 0;
-      }
-
-      .choice-section legend {
-        margin-bottom: 5px;
-        color: var(--muted-text);
-        font-size: 14px;
-        font-weight: 500;
+        border: 0;
       }
 
       .choice-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
-        gap: 6px;
+        grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+        gap: 8px;
       }
 
       .choice-button {
-        min-height: 34px;
-        padding: 7px 8px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        min-height: 40px;
+        padding: 9px 8px;
+        border-color: transparent;
         background: var(--muted-surface);
         color: var(--text-color);
         font-size: 14px;
+        font-weight: 650;
         line-height: 1.15;
         text-align: center;
         white-space: normal;
       }
 
       .choice-button:hover {
-        background: #ececf1;
+        border-color: rgba(25, 95, 86, 0.2);
+        background: #e3ebe6;
       }
 
       .choice-button[aria-pressed='true'] {
-        border-color: var(--primary-color);
-        background: var(--primary-color);
-        color: white;
-        box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.13);
+        border-color: rgba(25, 95, 86, 0.38);
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+        box-shadow: inset 0 0 0 1px rgba(25, 95, 86, 0.22);
       }
 
       .submit-area {
         position: relative;
         overflow: hidden;
-        margin-top: 4px;
+        margin-top: 2px;
         border-radius: 8px;
       }
 
@@ -220,16 +301,18 @@
         z-index: 10;
         max-width: 520px;
         margin: 0 auto;
-        padding: 11px 13px;
-        border-radius: 10px;
-        color: white;
+        padding: 12px 14px;
+        border-radius: 8px;
+        color: #ffffff;
         font-size: 15px;
-        font-weight: 500;
+        font-weight: 650;
         line-height: 1.3;
         opacity: 0;
         pointer-events: none;
         transform: translateY(14px);
-        transition: opacity 0.18s ease, transform 0.18s ease;
+        transition:
+          opacity 0.18s ease,
+          transform 0.18s ease;
       }
 
       .toast.is-visible {
@@ -245,64 +328,159 @@
         background: var(--error-color);
       }
 
-      .filter-controls {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
+      .report-period {
+        margin: -7px 0 14px;
+        color: var(--muted-text);
+        font-size: 14px;
+        font-weight: 650;
       }
 
-      .filter-controls select {
-        flex: 1;
-        min-width: 120px;
+      #expenseResults {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .chart {
+        display: grid;
+        gap: 12px;
+      }
+
+      .chart-row {
+        display: grid;
+        gap: 6px;
+      }
+
+      .chart-meta {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .chart-label {
+        color: var(--text-color);
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .chart-numbers {
+        color: var(--muted-text);
+        font-size: 12px;
+        font-weight: 750;
+        line-height: 1.2;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .chart-track {
+        height: 10px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--muted-surface);
+      }
+
+      .chart-bar {
+        width: var(--bar-width);
+        height: 100%;
+        border-radius: inherit;
+        background: var(--accent-color);
+      }
+
+      .summary-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 13px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-color);
+        font-size: 14px;
+        font-weight: 800;
       }
 
       table {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        font-size: 15px;
+        min-width: 520px;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #ffffff;
+        font-size: 14px;
       }
 
       th,
       td {
-        border: 1px solid var(--border-color);
-        padding: 10px;
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--border-color);
         text-align: left;
+        vertical-align: top;
       }
 
       th {
-        background-color: var(--muted-surface);
-        font-weight: 500;
+        background: var(--muted-surface);
+        color: var(--muted-text);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
       }
 
       .summary {
-        margin-top: 25px;
+        margin-top: 0;
       }
 
-      .summary h3 {
-        margin-bottom: 10px;
+      .error {
+        margin: 0;
+        padding: 12px;
+        border: 1px solid rgba(180, 35, 24, 0.22);
+        border-radius: 8px;
+        background: #fff0ed;
+        color: var(--error-color);
+        font-weight: 650;
+      }
+
+      .loading,
+      #expenseResults > p:not(.error) {
+        margin: 0;
+        padding: 18px 0 4px;
+        color: var(--muted-text);
+        font-size: 14px;
       }
 
       @media (max-width: 600px) {
-        body {
-          padding: 10px;
+        .app-shell {
+          padding: 14px 10px 24px;
+        }
+
+        .app-header {
+          padding-bottom: 12px;
+        }
+
+        h1 {
+          font-size: 28px;
         }
 
         .form-section,
         .report-section {
           padding: 14px;
-          border-radius: 10px;
         }
 
         .form-row {
-          flex-direction: column;
-          gap: 7px;
-          margin-bottom: 8px;
+          grid-template-columns: 1fr;
+          gap: 9px;
+          margin-bottom: 10px;
         }
 
-        .form-group {
-          width: 100%;
+        .form-row.paired-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .choice-grid {
@@ -310,284 +488,245 @@
         }
 
         .choice-button {
-          min-height: 33px;
-          padding: 7px 5px;
+          min-height: 38px;
+          padding: 8px 6px;
           font-size: 13px;
         }
       }
 
-      /* Additional utility classes */
-      .error {
-        color: #ff3b30;
-        padding: 10px;
-        background-color: #ffebee;
-        border-radius: 4px;
-      }
-
-      .loading {
-        text-align: center;
-        padding: 20px;
-        color: var(--muted-text);
-        font-style: italic;
-      }
     </style>
   </head>
   <body>
-    <h1>Expense Tracker</h1>
+    <main class="app-shell">
+      <header class="app-header">
+        <h1>Expense Tracker</h1>
+        <span class="currency-pill">CAD</span>
+      </header>
 
-    <div class="form-section">
-      <h2>Add New Transaction</h2>
-      <form
-        id="dataForm"
-        autocomplete="off"
-        novalidate>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="date">Date</label>
-            <input
-              type="date"
-              id="date"
-              required />
-          </div>
-          <div class="form-group">
-            <label for="description">Description</label>
-            <input
-              type="text"
-              id="description"
-              placeholder="Enter description"
-              autocomplete="off"
-              required />
-          </div>
+      <div class="form-section">
+        <div class="section-heading">
+          <h2>Add Transaction</h2>
         </div>
+        <form
+          id="dataForm"
+          autocomplete="off"
+          novalidate>
+          <div class="form-row single">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input
+                type="text"
+                id="description"
+                placeholder="Enter description"
+                autocomplete="off"
+                required />
+            </div>
+          </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="amount">Amount</label>
+          <div class="form-row paired-row">
+            <div class="form-group">
+              <label for="amount">Amount</label>
+              <input
+                type="number"
+                id="amount"
+                placeholder="0.00"
+                step="0.01"
+                inputmode="decimal"
+                required />
+            </div>
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input
+                type="date"
+                id="date"
+                required />
+            </div>
+          </div>
+
+          <fieldset class="choice-section">
+            <legend>Payment Method</legend>
             <input
-              type="number"
-              id="amount"
-              placeholder="0.00"
-              step="0.01"
-              inputmode="decimal"
+              type="hidden"
+              id="paymentMethod"
               required />
-          </div>
-        </div>
+            <div
+              class="choice-grid"
+              data-choice-group="paymentMethod">
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Cash/ET"
+                aria-pressed="false">
+                Cash/ET
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="TD Debit"
+                aria-pressed="false">
+                TD Debit
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="TD Credit"
+                aria-pressed="false">
+                TD Credit
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="RBC Credit"
+                aria-pressed="false">
+                RBC Credit
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Amex Credit"
+                aria-pressed="false">
+                Amex
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Neo Credit"
+                aria-pressed="false">
+                Neo
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Capital One Credit"
+                aria-pressed="false">
+                Capital One
+              </button>
+            </div>
+          </fieldset>
 
-        <fieldset class="choice-section">
-          <legend>Payment Method</legend>
-          <input
-            type="hidden"
-            id="paymentMethod"
-            required />
+          <fieldset class="choice-section">
+            <legend>Category</legend>
+            <input
+              type="hidden"
+              id="category"
+              required />
+            <div
+              class="choice-grid"
+              data-choice-group="category">
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Food"
+                aria-pressed="false">
+                Food
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Groceries"
+                aria-pressed="false">
+                Groceries
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Transportation"
+                aria-pressed="false">
+                Transport
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Shopping"
+                aria-pressed="false">
+                Shopping
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Beer"
+                aria-pressed="false">
+                Beer
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Bars"
+                aria-pressed="false">
+                Bars
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Subscriptions"
+                aria-pressed="false">
+                Subs
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Entertainment"
+                aria-pressed="false">
+                Fun
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Rent"
+                aria-pressed="false">
+                Rent
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Fees"
+                aria-pressed="false">
+                Fees
+              </button>
+              <button
+                type="button"
+                class="choice-button"
+                data-value="Other"
+                aria-pressed="false">
+                Other
+              </button>
+            </div>
+          </fieldset>
+
           <div
-            class="choice-grid"
-            data-choice-group="paymentMethod">
+            class="submit-area"
+            id="submitArea">
             <button
-              type="button"
-              class="choice-button"
-              data-value="Cash/ET"
-              aria-pressed="false">
-              Cash/ET
+              type="submit"
+              id="submitButton">
+              Add Transaction
             </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="TD Debit"
-              aria-pressed="false">
-              TD Debit
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="TD Credit"
-              aria-pressed="false">
-              TD Credit
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="RBC Credit"
-              aria-pressed="false">
-              RBC Credit
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Amex Credit"
-              aria-pressed="false">
-              Amex
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Neo Credit"
-              aria-pressed="false">
-              Neo
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Capital One Credit"
-              aria-pressed="false">
-              Capital One
-            </button>
+            <div
+              class="submit-progress"
+              aria-hidden="true"></div>
           </div>
-        </fieldset>
-
-        <fieldset class="choice-section">
-          <legend>Category</legend>
-          <input
-            type="hidden"
-            id="category"
-            required />
-          <div
-            class="choice-grid"
-            data-choice-group="category">
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Food"
-              aria-pressed="false">
-              Food
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Groceries"
-              aria-pressed="false">
-              Groceries
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Transportation"
-              aria-pressed="false">
-              Transport
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Shopping"
-              aria-pressed="false">
-              Shopping
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Beer"
-              aria-pressed="false">
-              Beer
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Bars"
-              aria-pressed="false">
-              Bars
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Subscriptions"
-              aria-pressed="false">
-              Subs
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Entertainment"
-              aria-pressed="false">
-              Fun
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Rent"
-              aria-pressed="false">
-              Rent
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Fees"
-              aria-pressed="false">
-              Fees
-            </button>
-            <button
-              type="button"
-              class="choice-button"
-              data-value="Other"
-              aria-pressed="false">
-              Other
-            </button>
-          </div>
-        </fieldset>
-
-        <div class="submit-area" id="submitArea">
-          <button
-            type="submit"
-            id="submitButton">
-            Add Transaction
-          </button>
-          <div
-            class="submit-progress"
-            aria-hidden="true"></div>
-        </div>
-      </form>
-    </div>
-
-    <div
-      id="toast"
-      class="toast"
-      role="status"
-      aria-live="polite"></div>
-
-    <div class="report-section">
-      <h2>Expense Report</h2>
-      <div class="filter-controls">
-        <select
-          id="monthSelect"
-          required>
-          <option
-            value=""
-            disabled
-            selected>
-            Select Month
-          </option>
-          <option value="1">January</option>
-          <option value="2">February</option>
-          <option value="3">March</option>
-          <option value="4">April</option>
-          <option value="5">May</option>
-          <option value="6">June</option>
-          <option value="7">July</option>
-          <option value="8">August</option>
-          <option value="9">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
-        <select
-          id="yearSelect"
-          required>
-          <option
-            value=""
-            disabled
-            selected>
-            Select Year
-          </option>
-        </select>
-        <button
-          id="showExpensesBtn"
-          disabled>
-          Show Expenses
-        </button>
+        </form>
       </div>
 
-      <div id="expenseResults">
-        <!-- Results will appear here -->
+      <div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"></div>
+
+      <div class="report-section">
+        <div class="section-heading">
+          <h2>Expense Report</h2>
+        </div>
+        <p
+          id="reportPeriod"
+          class="report-period"></p>
+
+        <div id="expenseResults">
+          <!-- Results will appear here -->
+        </div>
       </div>
-    </div>
+    </main>
 
     <script src="config.js"></script>
     <script>
@@ -596,17 +735,106 @@
       const SCRIPT_URL =
         window.FINANCE_TRACKER_CONFIG?.SCRIPT_URL || DEFAULT_SCRIPT_URL
 
-      // Populate year dropdown
-      function populateYears() {
-        const yearSelect = document.getElementById('yearSelect')
-        const currentYear = new Date().getFullYear()
-        for (let year = currentYear; year >= currentYear - 1; year--) {
-          const option = document.createElement('option')
-          option.value = year
-          option.textContent = year
-          yearSelect.appendChild(option)
-        }
-      }
+      const SAMPLE_EXPENSES = [
+        {
+          date: '2026-05-01',
+          description: 'May rent',
+          amount: 1850,
+          tender: 'Cash/ET',
+          category: 'Rent',
+        },
+        {
+          date: '2026-05-02',
+          description: 'No Frills grocery run',
+          amount: 86.42,
+          tender: 'TD Debit',
+          category: 'Groceries',
+        },
+        {
+          date: '2026-05-03',
+          description: 'TTC monthly pass',
+          amount: 156,
+          tender: 'RBC Credit',
+          category: 'Transportation',
+        },
+        {
+          date: '2026-05-04',
+          description: 'Netflix subscription',
+          amount: 18.63,
+          tender: 'Amex Credit',
+          category: 'Subscriptions',
+        },
+        {
+          date: '2026-05-06',
+          description: 'Coffee with Sam',
+          amount: 9.85,
+          tender: 'TD Credit',
+          category: 'Food',
+        },
+        {
+          date: '2026-05-08',
+          description: 'Shoppers toiletries',
+          amount: 43.27,
+          tender: 'Neo Credit',
+          category: 'Shopping',
+        },
+        {
+          date: '2026-05-10',
+          description: 'Pizza dinner',
+          amount: 31.5,
+          tender: 'TD Credit',
+          category: 'Food',
+        },
+        {
+          date: '2026-05-11',
+          description: 'LCBO tall cans',
+          amount: 24.9,
+          tender: 'Cash/ET',
+          category: 'Beer',
+        },
+        {
+          date: '2026-05-13',
+          description: 'Bar tab downtown',
+          amount: 68.44,
+          tender: 'Amex Credit',
+          category: 'Bars',
+        },
+        {
+          date: '2026-05-15',
+          description: 'Concert ticket',
+          amount: 74.25,
+          tender: 'RBC Credit',
+          category: 'Entertainment',
+        },
+        {
+          date: '2026-05-18',
+          description: 'Farm Boy groceries',
+          amount: 112.36,
+          tender: 'TD Debit',
+          category: 'Groceries',
+        },
+        {
+          date: '2026-05-20',
+          description: 'Uber home',
+          amount: 22.18,
+          tender: 'Capital One Credit',
+          category: 'Transportation',
+        },
+        {
+          date: '2026-05-22',
+          description: 'Bank account fee',
+          amount: 16.95,
+          tender: 'TD Debit',
+          category: 'Fees',
+        },
+        {
+          date: '2026-05-25',
+          description: 'Birthday gift',
+          amount: 58.72,
+          tender: 'Neo Credit',
+          category: 'Other',
+        },
+      ]
 
       const currencyFormatter = new Intl.NumberFormat('en-CA', {
         style: 'currency',
@@ -656,6 +884,11 @@
       }
 
       function formatDate(value) {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          const [year, month, day] = value.split('-').map(Number)
+          return new Date(year, month - 1, day).toLocaleDateString()
+        }
+
         const date = new Date(value)
         if (Number.isNaN(date.getTime())) {
           return value || ''
@@ -796,25 +1029,6 @@
         })
       }
 
-      function setupEventListeners() {
-        const yearSelect = document.getElementById('yearSelect')
-        const monthSelect = document.getElementById('monthSelect')
-        const showBtn = document.getElementById('showExpensesBtn')
-
-        // Enable/disable button based on selections
-        function checkSelections() {
-          showBtn.disabled = !(yearSelect.value || monthSelect.value)
-        }
-
-        yearSelect.addEventListener('change', checkSelections)
-        monthSelect.addEventListener('change', checkSelections)
-
-        showBtn.addEventListener('click', function (e) {
-          e.preventDefault()
-          loadExpenses()
-        })
-      }
-
       function buildExpensesUrl(year, month) {
         const url = new URL(getScriptUrl())
         if (year) {
@@ -824,6 +1038,48 @@
           url.searchParams.set('month', month)
         }
         return url.toString()
+      }
+
+      function getSampleExpenses(year, month) {
+        return SAMPLE_EXPENSES.filter((expense) => {
+          const expenseDate = new Date(`${expense.date}T00:00:00`)
+          const matchesYear = !year || expenseDate.getFullYear() === Number(year)
+          const matchesMonth = !month || expenseDate.getMonth() + 1 === Number(month)
+          return matchesYear && matchesMonth
+        })
+      }
+
+      function buildSampleExpensesData(year, month) {
+        const expenses = getSampleExpenses(year, month)
+        const categoryTotals = expenses.reduce((totals, expense) => {
+          totals[expense.category] = (totals[expense.category] || 0) + expense.amount
+          return totals
+        }, {})
+        const grandTotal = expenses.reduce((total, expense) => total + expense.amount, 0)
+        const summary = Object.entries(categoryTotals)
+          .sort(([, firstAmount], [, secondAmount]) => secondAmount - firstAmount)
+          .map(([category, amount]) => ({
+            category,
+            amount,
+            percentageFormatted: grandTotal
+              ? `${((amount / grandTotal) * 100).toFixed(1)}%`
+              : '0%',
+          }))
+
+        return {
+          allTransactions: [
+            ['Date', 'Description', 'Amount', 'Payment', 'Category'],
+            ...expenses.map((expense) => [
+              expense.date,
+              expense.description,
+              expense.amount,
+              expense.tender,
+              expense.category,
+            ]),
+          ],
+          summary,
+          grandTotal,
+        }
       }
 
       function validateExpensesResponse(data) {
@@ -838,50 +1094,86 @@
         }
       }
 
-      function renderExpenses(data, container) {
-        const allTransactions = data.allTransactions.slice(1)
-        const elements = [createElement('h3', 'All Transactions')]
-
-        if (allTransactions.length > 0) {
-          const rows = allTransactions.map((row) => [
-            formatDate(row[0]),
-            row[1] || '',
-            formatAmount(row[2]),
-            row[3] || '',
-          ])
-          elements.push(
-            createTable(['Date', 'Description', 'Amount', 'Payment'], rows)
-          )
-        } else {
-          elements.push(createElement('p', 'No transactions found'))
+      function getActiveReportPeriod() {
+        const today = new Date()
+        return {
+          month: today.getMonth() + 1,
+          year: today.getFullYear(),
         }
+      }
+
+      function formatReportPeriod(year, month) {
+        return new Intl.DateTimeFormat('en-CA', {
+          month: 'long',
+          year: 'numeric',
+        }).format(new Date(year, month - 1, 1))
+      }
+
+      function createCategoryChart(items, grandTotal) {
+        const chart = createElement('div', undefined, 'chart')
+        const maxAmount = Math.max(...items.map((item) => Number(item.amount)), 0)
+
+        items.forEach((item) => {
+          const amount = Number(item.amount) || 0
+          const percentage = grandTotal ? `${((amount / grandTotal) * 100).toFixed(1)}%` : '0%'
+          const row = createElement('div', undefined, 'chart-row')
+          const meta = createElement('div', undefined, 'chart-meta')
+          const label = createElement('span', item.category || '', 'chart-label')
+          const numbers = createElement(
+            'span',
+            `${formatAmount(amount)} | ${percentage}`,
+            'chart-numbers'
+          )
+          const track = createElement('div', undefined, 'chart-track')
+          const bar = createElement('div', undefined, 'chart-bar')
+
+          bar.style.setProperty(
+            '--bar-width',
+            `${maxAmount ? Math.max((amount / maxAmount) * 100, 2) : 0}%`
+          )
+          meta.append(label, numbers)
+          track.appendChild(bar)
+          row.append(meta, track)
+          chart.appendChild(row)
+        })
+
+        return chart
+      }
+
+      function renderExpenses(data, container) {
+        const elements = []
 
         if (data.summary && data.summary.length > 0) {
           const summary = createElement('div', undefined, 'summary')
-          const rows = data.summary.map((item) => [
-            item.category || '',
-            formatAmount(item.amount),
-            item.percentageFormatted || item.percentage || '',
-          ])
+          const total = createElement('div', undefined, 'summary-total')
+          const totalLabel = createElement('span', 'Total')
+          const totalAmount = createElement('span', formatAmount(data.grandTotal))
 
-          rows.push(['Total', formatAmount(data.grandTotal), '100%'])
           summary.appendChild(createElement('h3', 'Category Summary'))
-          summary.appendChild(
-            createTable(['Category', 'Amount', 'Percentage'], rows)
-          )
+          summary.appendChild(createCategoryChart(data.summary, data.grandTotal))
+          total.append(totalLabel, totalAmount)
+          summary.appendChild(total)
           elements.push(summary)
+        } else {
+          elements.push(createElement('p', 'No transactions found'))
         }
 
         container.replaceChildren(...elements)
       }
 
-      // Load expenses based on filters
-      async function loadExpenses() {
-        const year = document.getElementById('yearSelect').value
-        const month = document.getElementById('monthSelect').value
+      async function loadActiveMonthExpenses() {
+        const { year, month } = getActiveReportPeriod()
         const resultsDiv = document.getElementById('expenseResults')
+        const reportPeriod = document.getElementById('reportPeriod')
+        const sampleData = buildSampleExpensesData(year, month)
+        reportPeriod.textContent = formatReportPeriod(year, month)
 
         try {
+          if (sampleData.allTransactions.length > 1) {
+            renderExpenses(sampleData, resultsDiv)
+            return
+          }
+
           resultsDiv.replaceChildren(createElement('p', 'Loading...', 'loading'))
           const response = await fetch(buildExpensesUrl(year, month))
           const data = await readJsonResponse(response)
@@ -917,8 +1209,7 @@
         restoreSavedChoices()
         setupChoiceButtons()
         setupEntryFlow()
-        populateYears()
-        setupEventListeners()
+        loadActiveMonthExpenses()
         document.getElementById('description').focus()
       })
 
